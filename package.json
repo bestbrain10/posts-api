@@ -4,7 +4,15 @@
   "description": "Simple Facebook Posts API",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --config jest.config.json",
+    "coverage": "rm -rf coverage && jest --config jest.config.json --coverage",
+    "test:e2e": "jest --config jest-e2e.config.json",
+    "e2e:ci": "npm run migrate:run && npm run test:e2e",
+    "lint": "eslint \"**/*.js\" --fix",
+    "migrate:create": "sequelize-cli migration:generate --name",
+    "migrate:run": "sequelize-cli db:migrate",
+    "start": "node index.js",
+    "start:dev": "nodemon index.js"
   },
   "repository": {
     "type": "git",
