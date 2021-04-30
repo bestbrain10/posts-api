@@ -5,7 +5,7 @@ const joiValidator = require('./joi-validator');
 describe('Joi Validator', () => {
 	// does not abort early
 	describe('Validate', () => {
-		test('Does not abort early', async () => {
+		it('Does not abort early', async () => {
 			const schema = Joi.object().keys({
 				power: Joi.number().integer().required(),
 				name: Joi.string().required()
@@ -25,7 +25,7 @@ describe('Joi Validator', () => {
 			}
 		});
 
-		test('removes unknown keys from payload', async () => {
+		it('removes unknown keys from payload', async () => {
 			const schema = Joi.object().keys({
 				power: Joi.number().integer().required(),
 				name: Joi.string().required()
@@ -46,7 +46,7 @@ describe('Joi Validator', () => {
 			});
 		});
 
-		test('converts values based on validation rule', async () => {
+		it('converts values based on validation rule', async () => {
 			const schema = Joi.object().keys({
 				power: Joi.number().integer().required(),
 				name: Joi.string().lowercase().required()
@@ -68,7 +68,7 @@ describe('Joi Validator', () => {
 	});
 
 	describe('Reduce Errors', () => {
-		test('Can modify errors to simple POJO', () => {
+		it('Can modify errors to simple POJO', () => {
 			const errors = [{
 				context: {
 					label: 'powers',
@@ -92,7 +92,7 @@ describe('Joi Validator', () => {
 	});
 
 	describe('Modify Errors', () => {
-		test('returns error message is details is not present', () => {
+		it('returns error message is details is not present', () => {
 			const errors = {
 				message: 'I got stuff for you'
 			};
@@ -101,7 +101,7 @@ describe('Joi Validator', () => {
 			expect(result).toBe(errors.message);
 		});
 
-		test('returns modified error details if present', () => {
+		it('returns modified error details if present', () => {
 			const errors = {
 				details: [{
 					context: {

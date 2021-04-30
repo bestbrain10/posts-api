@@ -2,7 +2,7 @@ const { mockRequest, mockResponse, } = require('../../__mocks__/http');
 const notFoundMiddleware = require('./not-found.middleware');
 
 describe('Not found middleware', () => {
-	test('shows not found message', () => {
+	it('shows not found message', () => {
 		const method = 'GET';
 		const originalUrl = '/suits';
 		const req = mockRequest({

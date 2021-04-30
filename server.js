@@ -9,6 +9,7 @@ const authMiddleware = require('./common/middlewares/auth.middleware');
 const indexRoute = require('./common/middlewares/index.middleware');
 const authRoutes = require('./auth/routes');
 const userRoutes = require('./users/routes');
+const postRoutes = require('./posts/routes');
 
 
 
@@ -50,7 +51,7 @@ app.response = Object.create(customExpress);
 app.all('/', indexRoute);
 app.use(authRoutes);
 app.use('/users', authMiddleware, userRoutes);
-
+app.use('/posts', authMiddleware, postRoutes);
 
 
 // catch all errors middleware
