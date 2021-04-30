@@ -30,7 +30,7 @@ Simple Facebook Posts API
 
 - Open your CLI, run `createdb <database>` to create a database with default username and password (`postgres`)
 
-## Running Application as API Locally
+## Running Locally
 
  - create a `.env` file in the project directory using `env.example` as template
 
