@@ -5,31 +5,31 @@ const Login = require('../models/login.model');
 
 
 describe('Login Controller', () => {
-    it('Can Login', async () => {
-        const req = mockRequest({
-            body: {
-                email: 'ironman@avengers.com',
-                password: 'password'
-            }
-        });
-        const res = mockResponse();
+	it('Can Login', async () => {
+		const req = mockRequest({
+			body: {
+				email: 'ironman@avengers.com',
+				password: 'password'
+			}
+		});
+		const res = mockResponse();
 
-        const userLoginSpy = jest.spyOn(User, 'login');
-        userLoginSpy.mockResolvedValueOnce({
-            id: 5
-        });
+		const userLoginSpy = jest.spyOn(User, 'login');
+		userLoginSpy.mockResolvedValueOnce({
+			id: 5
+		});
 
-        const loginSpy = jest.spyOn(Login, 'loginUser');
-        loginSpy.mockResolvedValueOnce({
-            id: 5,
-            token: 'sdsdsd'
-        });
+		const loginSpy = jest.spyOn(Login, 'loginUser');
+		loginSpy.mockResolvedValueOnce({
+			id: 5,
+			token: 'sdsdsd'
+		});
 
-        await LoginController.login(req, res, mockNext);
+		await LoginController.login(req, res, mockNext);
 
-        expect(res.data).toBeCalledWith({
-            id: 5,
-            token: 'sdsdsd'
-        });
-    });
+		expect(res.data).toBeCalledWith({
+			id: 5,
+			token: 'sdsdsd'
+		});
+	});
 });

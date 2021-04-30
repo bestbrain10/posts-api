@@ -1,4 +1,4 @@
-const { Model, DataTypes, Sequelize } = require('sequelize');
+const { Model, DataTypes, } = require('sequelize');
 const hashPassword = require('../common/utils/hash-password');
 const DB = require('../database');
 const { omit } = require('lodash');
