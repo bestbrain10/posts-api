@@ -1,4 +1,5 @@
 
+const Joi = require('joi');
 const User = require('../models/user.model');
 
 module.exports = class {
@@ -27,5 +28,36 @@ module.exports = class {
 		}
 
 		res.data(user.toJSON());
+	}
+
+	static get changePasswordSchema() {
+		return Joi.object().keys({
+			password: Joi.string().required(),
+			new_password: Joi.string().required(),
+			new_password_repeat: Joi.string().required()
+		});
+	}
+
+	static passwordRepeatCheck(req, res, next) {
+		const { new_password: newPassword, new_password_repeat: newPasswordRepeat } = req.body;
+		if(newPassword === newPasswordRepeat) {
+			req.body = {
+				password: req.body.password,
+				newPassword,
+			};
+			return next();
+		}
+
+		return res.status(400).error({ new_password_repeat: 'Password do not match' });
+	}
+
+	// eslint-disable-next-line no-unused-vars
+	static async changePassword(req, res, next) {
+		const user = await User.changePassword({
+			userID: req.user.id,
+			...req.body
+		});
+
+		res.data(user);
 	}
 };

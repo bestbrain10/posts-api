@@ -1,11 +1,9 @@
 require('dotenv').config();
 
 const { mockNext, mockRequest, mockResponse } = require('../../__mocks__/http');
-const UserController = require('./user.controller');
+const UsersController = require('./user.controller');
 const User = require('../models/user.model');
-
-
-
+const joiValidator = require('../../common/utils/joi-validator');
 
 describe('User Controller', () => {
 	describe('profile', () => {
@@ -18,7 +16,7 @@ describe('User Controller', () => {
 			});
 			const res = mockResponse();
 
-			await UserController.profile(req, res, mockNext);
+			await UsersController.profile(req, res, mockNext);
 
 			expect(res.data).toBeCalledWith({
 				id: 6,
@@ -45,7 +43,7 @@ describe('User Controller', () => {
 				}
 			});
 
-			await UserController.getOneUser(req, res, mockNext);
+			await UsersController.getOneUser(req, res, mockNext);
 
 			expect(res.data).toBeCalledWith({
 				id: 6,
@@ -66,7 +64,7 @@ describe('User Controller', () => {
 				{id: 2},
 			]);
 
-			await UserController.getAllUsers(req, res, mockNext);
+			await UsersController.getAllUsers(req, res, mockNext);
 
 			expect(res.data).toBeCalledWith([
 				{id: 1},
@@ -93,7 +91,7 @@ describe('User Controller', () => {
 				{id: 2},
 			]);
 
-			await UserController.getAllUsers(req, res, mockNext);
+			await UsersController.getAllUsers(req, res, mockNext);
 
 			expect(res.data).toBeCalledWith([
 				{id: 1},
@@ -104,6 +102,100 @@ describe('User Controller', () => {
 				limit: 60,
 				offset: 3
 			});
+		});
+	});
+
+	describe('Check password repeat', () => {
+		it('calls next if password is repeated correctly', () => {
+			const req = mockRequest({
+				body: {
+					password: 'snap',
+					new_password: 'clap',
+					new_password_repeat: 'clap'
+				}
+			});
+
+			const res = mockResponse();
+			const next = jest.fn();
+			UsersController.passwordRepeatCheck(req, res, next);
+
+			expect(next).toBeCalled();
+			expect(req.body).toMatchObject({
+				password: 'snap',
+				newPassword: 'clap'
+			});
+		});
+
+		it('returns error if password is not repeated correctly', () => {
+			const req = mockRequest({
+				body: {
+					password: 'snap',
+					new_password: 'clap',
+					new_password_repeat: 'smash'
+				}
+			});
+
+			const res = mockResponse();
+			const next = jest.fn();
+			UsersController.passwordRepeatCheck(req, res, next);
+
+			expect(res.status).toBeCalledWith(400);
+			expect(res.error).toBeCalledWith({
+				new_password_repeat: 'Password do not match'
+			});
+		});
+	});
+
+	describe('Change Password Schema', () => {
+		it('fails validation for invalid payload', async () => {
+			const payload = {
+				password: 'snap',
+				new_password: 'clap',
+				new_password_repeat: 'clap'
+			};
+			const result = await joiValidator.validate(payload, UsersController.changePasswordSchema);
+			expect(result).toMatchObject(payload);
+		});
+
+		it('passes validation for valid payload', async () => {
+			const payload = {
+				password: 'snap',
+				new_password: 'clap',
+				new_password_repeat: 'smash'
+			};
+			try {
+				await joiValidator.validate(payload, UsersController.changePasswordSchema);
+			} catch(e) {
+				expect(e).toMatchObject(payload);
+			}
+		});
+	});
+
+	describe('Change Password', () => {
+		it('Changes User Password', async () => {
+			const req = mockRequest({
+				body: {
+					password: 'smash',
+					newPassword: 'clapp'
+				},
+				user: {
+					id: '134'
+				}
+			});
+
+			const res = mockResponse();
+
+			const passwordSpy = jest.spyOn(User, 'changePassword').mockResolvedValueOnce(true);
+
+			await UsersController.changePassword(req, res, mockNext);
+
+			expect(passwordSpy).toBeCalledWith({
+				userID: '134',
+				password: 'smash',
+				newPassword: 'clapp'
+			});
+
+			expect(res.data).toBeCalledWith(true);
 		});
 	});
 });

@@ -19,7 +19,7 @@ describe('Login Model', () => {
 			}, {
 				where: {
 					id: 1,
-					loggedOut: null,
+					loggedOut: false,
 				},
 			});
 		});
@@ -76,7 +76,7 @@ describe('Login Model', () => {
 			expect(fetchSpy).toBeCalledWith({
 				where: {
 					id: 33,
-					loggedOut: null
+					loggedOut: false
 				},
 				attributes: ['user']
 			});

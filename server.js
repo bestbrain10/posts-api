@@ -4,8 +4,11 @@ const app = express();
 
 const catchAllErrorsMiddleware = require('./common/middlewares/catch-all-errors.middleware');
 const notFoundMiddleware = require('./common/middlewares/not-found.middleware');
+const authMiddleware = require('./common/middlewares/auth.middleware');
+
 const indexRoute = require('./common/middlewares/index.middleware');
 const authRoutes = require('./auth/routes');
+const userRoutes = require('./users/routes');
 
 
 
@@ -46,6 +49,7 @@ app.response = Object.create(customExpress);
 
 app.all('/', indexRoute);
 app.use(authRoutes);
+app.use('/users', authMiddleware, userRoutes);
 
 
 

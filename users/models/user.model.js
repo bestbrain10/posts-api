@@ -58,6 +58,31 @@ class User extends Model {
 
 		return omit(user.toJSON(), ['password']);
 	}
+
+	/**
+	 * 
+	 * @param {object} param
+	 * @param {string} param.userID id of user whose password is being changed
+	 * @param {string} param.password current user's password
+	 * @param {string} param.newPassword user's new password
+	 * @returns Promise<boolean|object>
+	 */
+	static async changePassword({ userID, password, newPassword }) {
+		const [ count ] = await this.update({
+			password: hashPassword(newPassword)
+		}, {
+			where: {
+				password: hashPassword(password),
+				id: userID
+			}
+		});
+
+		if(!count) {
+			return Promise.reject({ password: 'Incorrect password' });
+		}
+
+		return true;
+	}
 }
 
 User.init({

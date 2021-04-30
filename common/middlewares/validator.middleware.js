@@ -1,15 +1,4 @@
-const joi = require('joi');
-
-/**
- * reducer callback function to turn joi error message into a simple object
- * it takes the label or key property and makes it a key in the accumulatedObject
- * while the value of the key would be the error message
- * @param {Object} accumulatedObject
- * @param {Object} currentError
- */
-const reducer = (accumulatedObject, currentError) => Object.assign(accumulatedObject, {
-	[currentError.context.label || currentError.context.key]: currentError.message.replace(new RegExp('"', 'ig'), ''),
-});
+const joiValidator = require('../utils/joi-validator');
 
 /**
  * takes in a joi validation schema
@@ -19,17 +8,13 @@ const reducer = (accumulatedObject, currentError) => Object.assign(accumulatedOb
  */
 module.exports = (schema) => async (req, res, next) => {
 	try {
-		const value = await joi.attempt(req.body || {}, schema, {
-			abortEarly: false,
-			convert: true,
-			stripUnknown: true,
-		});
+		const value = await joiValidator.validate(req.body || {}, schema);
 		req.bodyOld = req.body;
 		// refined request body
 		req.body = value;
 		next();
 	} catch (error) {
 		// refined error message
-		res.status(400).error(!error.details ? error.message : error.details.reduce(reducer, {}));
+		res.status(400).error(error);
 	}
 };

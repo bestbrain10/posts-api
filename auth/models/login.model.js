@@ -10,7 +10,7 @@ class Login extends Model {
 		},{
 			where: { 
 				id: loginID,
-				loggedOut: null,
+				loggedOut: false,
 			},
 		});
 
@@ -33,7 +33,7 @@ class Login extends Model {
 		return this.findOne({
 			where: {
 				id: loginID,
-				loggedOut: null
+				loggedOut: false
 			},
 			attributes: ['user']
 		});
@@ -57,8 +57,15 @@ Login.init({
 		defaultValue: DataTypes.UUIDV4,
 		primaryKey: true
 	},
-	user: DataTypes.INTEGER,
-	loggedOut: DataTypes.BOOLEAN,
+	user: {
+		type: DataTypes.UUID,
+		allowNull: false
+	},
+	loggedOut: {
+		type: DataTypes.BOOLEAN,
+		allowNull: false,
+		defaultValue: false
+	},
 	loggedOutAt: {
 		type: 'TIMESTAMP',
 	}
