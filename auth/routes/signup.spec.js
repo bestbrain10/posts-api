@@ -1,9 +1,9 @@
 require('dotenv').config();
 
 const request = require('supertest');
-const server = require('../server');
-const database = require('../database');
-const User = require('../models/user.model');
+const server = require('../../server');
+const database = require('../../database');
+const User = require('../../users/models/user.model');
 const { v4: uuid } = require('uuid');
 
 
@@ -21,7 +21,7 @@ describe('Signup API', () => {
 		let response;
 
 		beforeAll(async () => {
-			response = await request(server).post('/signup');
+			response = await request(server).post('/register');
 		});
 
 		it('returns 400 status code', () => {
@@ -59,7 +59,7 @@ describe('Signup API', () => {
 				defaults: requestArgs
 			});
 
-			response = await request(server).post('/signup').send(requestArgs);
+			response = await request(server).post('/register').send(requestArgs);
 		});
 
 		it('returns 400 status code', () => {
@@ -86,7 +86,7 @@ describe('Signup API', () => {
 		};
 
 		beforeAll(async () => {
-			response = await request(server).post('/signup').send(requestArgs);
+			response = await request(server).post('/register').send(requestArgs);
 		});
 
 		it('returns 201 status code', () => {
@@ -98,7 +98,7 @@ describe('Signup API', () => {
 			expect(response.body).toHaveProperty('data');
 
 			expect(Object.keys(response.body.data).sort())
-				.toEqual(['balance', 'email', 'fullname', 'id', 'createdAt', 'updatedAt'].sort());
+				.toEqual(['email', 'fullname', 'id', 'createdAt', 'updatedAt'].sort());
 		});
 	});
 });

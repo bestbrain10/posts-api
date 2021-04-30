@@ -1,6 +1,6 @@
 const { Model, DataTypes, } = require('sequelize');
-const hashPassword = require('../common/utils/hash-password');
-const DB = require('../database');
+const hashPassword = require('../../common/utils/hash-password');
+const DB = require('../../database');
 const { omit } = require('lodash');
 
 class User extends Model {
@@ -29,10 +29,7 @@ class User extends Model {
 			return Promise.reject({ email: 'Email already exists' });
 		}
 
-		const newUser =  await this.create({
-			...user,
-			balance: 0
-		});
+		const newUser =  await this.create(user);
 
 		return omit(newUser.toJSON(), ['password']);
 	}
@@ -65,13 +62,23 @@ class User extends Model {
 
 User.init({
 	id: {
-		type: DataTypes.INTEGER,
-		autoIncrement: true,
+		type: DataTypes.UUID,
+		allowNull: false,
+		defaultValue: DataTypes.UUIDV4,
 		primaryKey: true
 	},
-	fullname: DataTypes.STRING,
-	email: DataTypes.STRING,
-	password: DataTypes.STRING,
+	fullname: {
+		type: DataTypes.STRING,
+		allowNull: false
+	},
+	email: {
+		type: DataTypes.STRING,
+		allowNull: false
+	},
+	password: {
+		type: DataTypes.STRING,
+		allowNull: false
+	}
 }, {
 	tableName: 'users',
 	underscored: true,

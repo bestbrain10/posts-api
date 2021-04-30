@@ -1,9 +1,9 @@
 require('dotenv').config();
 
 const request = require('supertest');
-const server = require('../server');
-const database = require('../database');
-const User = require('../models/user.model');
+const server = require('../../server');
+const database = require('../../database');
+const User = require('../../users/models/user.model');
 
 
 describe('Login API', () => {
@@ -134,7 +134,7 @@ describe('Login API', () => {
 			expect(response.body).toHaveProperty('data');
 
 			expect(Object.keys(response.body.data).sort())
-				.toEqual(['balance', 'email', 'fullname', 'id', 'createdAt', 'updatedAt', 'token'].sort());
+				.toEqual(['email', 'fullname', 'id', 'createdAt', 'updatedAt', 'token'].sort());
 		});
 	});
 });

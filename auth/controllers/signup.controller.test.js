@@ -1,6 +1,6 @@
 const { mockNext, mockRequest, mockResponse } = require('../__mocks__/http');
 const SignupController = require('./signup.controller');
-const User = require('../models/user.model');
+const User = require('../../users/models/user.model');
 
 
 describe('Signup Controller', () => {
@@ -16,14 +16,14 @@ describe('Signup Controller', () => {
 
 		const userSignupSpy = jest.spyOn(User, 'register');
 		userSignupSpy.mockResolvedValueOnce({
-			id: 1
+			id: '1'
 		});
 
 		await SignupController.register(req, res, mockNext);
 
 		expect(res.status).toBeCalledWith(201);
 		expect(res.data).toBeCalledWith({
-			id: 1
+			id: '1'
 		});
 	});
 });

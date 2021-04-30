@@ -1,6 +1,6 @@
 const { Model, DataTypes, Sequelize } = require('sequelize');
-const jwt = require('../common/utils/jwt');
-const DB = require('../database');
+const jwt = require('../../common/utils/jwt');
+const DB = require('../../database');
 
 class Login extends Model {
 	static async logoutUser(loginID) {
@@ -52,8 +52,9 @@ class Login extends Model {
 
 Login.init({
 	id: {
-		type: DataTypes.INTEGER,
-		autoIncrement: true,
+		type: DataTypes.UUID,
+		allowNull: false,
+		defaultValue: DataTypes.UUIDV4,
 		primaryKey: true
 	},
 	user: DataTypes.INTEGER,
