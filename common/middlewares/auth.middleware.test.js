@@ -1,7 +1,7 @@
 const { mockRequest, mockResponse, mockNext } = require('../../__mocks__/http');
 const authMiddleware = require('./auth.middleware');
-const User = require('../../models/user.model');
-const Login = require('../../models/login.model');
+const User = require('../../users/models/user.model');
+const Login = require('../../auth/models/login.model');
 
 describe('Auth Middleware', () => {
 	it('returns error if Authorization header is missing', async () => {
