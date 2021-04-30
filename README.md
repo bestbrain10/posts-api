@@ -38,7 +38,7 @@ Simple Facebook Posts API
 
  - Run `npm run start` to start the server
 
- - From your browser or REST client visit `http://localhost:4000` 
+ - From your browser or REST client visit `http://localhost:3000` 
 
  - If you make any changes, you will have to first close the running server, save the file you made changes to and then start the server again using `npm run start`
 
