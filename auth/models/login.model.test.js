@@ -1,6 +1,6 @@
 const Login = require('./login.model');
 const { Sequelize } = require('sequelize');
-const jwt = require('../common/utils/jwt');
+const jwt = require('../../common/utils/jwt');
 
 describe('Login Model', () => {
 	describe('Logout Method', () => {

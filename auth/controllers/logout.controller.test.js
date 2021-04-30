@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const { mockNext, mockRequest, mockResponse } = require('../__mocks__/http');
+const { mockNext, mockRequest, mockResponse } = require('../../__mocks__/http');
 const LogoutController = require('./logout.controller');
 const Login = require('../models/login.model');
 

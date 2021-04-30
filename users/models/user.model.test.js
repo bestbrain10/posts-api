@@ -1,6 +1,5 @@
 const User = require('./user.model');
 const { omit } = require('lodash');
-const { Sequelize } = require('sequelize');
 
 
 describe('User Model', () => {
@@ -53,10 +52,7 @@ describe('User Model', () => {
 				},
 			});
 
-			expect(createSpy).toBeCalledWith({
-				...registerParams,
-				balance: 0
-			});
+			expect(createSpy).toBeCalledWith(registerParams);
 		});
 	});
 
@@ -132,50 +128,6 @@ describe('User Model', () => {
 			expect(compareSpy).toBeCalledWith(loginParams.password);
 
 			expect(result).toMatchObject(omit(user, ['password']));
-		});
-	});
-
-	describe('Modify Balance', () => {
-		it('throws error if no user balance was updated', async () => {
-			const updateSpy = jest.spyOn(User, 'update');
-			updateSpy.mockResolvedValueOnce([0]);
-			const user = 1;
-			const amount = 100;
-			const transaction = {};
-
-			try {
-				await User.modifyBalance(user, amount, transaction);
-			} catch(e) {
-				expect(e).toBe('Could not complete transaction');
-				expect(updateSpy).toBeCalledWith({
-					balance: Sequelize.literal(`balance + ${amount}`)
-				}, {
-					where: {
-						id: user
-					},
-					transaction
-				});
-			}
-		});
-
-		it('returns true if user balance was updated', async () => {
-			const updateSpy = jest.spyOn(User, 'update');
-			updateSpy.mockResolvedValueOnce([1]);
-			const user = 1;
-			const amount = 100;
-			const transaction = {};
-
-			const result = await User.modifyBalance(user, amount, transaction);
-
-			expect(result).toBe(true);
-			expect(updateSpy).toBeCalledWith({
-				balance: Sequelize.literal(`balance + ${amount}`)
-			}, {
-				where: {
-					id: user
-				},
-				transaction
-			});
 		});
 	});
 });

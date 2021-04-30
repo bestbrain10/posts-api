@@ -1,4 +1,4 @@
-const { mockNext, mockRequest, mockResponse } = require('../__mocks__/http');
+const { mockNext, mockRequest, mockResponse } = require('../../__mocks__/http');
 const SignupController = require('./signup.controller');
 const User = require('../../users/models/user.model');
 
