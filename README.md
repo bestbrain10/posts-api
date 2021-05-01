@@ -30,6 +30,15 @@ Simple Facebook Posts API
 
 - Open your CLI, run `createdb <database>` to create a database with default username and password (`postgres`)
 
+## Alternatively use Docker
+The database and API are already containerized to enable anyone setup quickly.
+
+ - Install docker on your laptop using https://docs.docker.com/engine/install/
+ - Once installation is complete, navigate to the project directory (post-api)
+ - create a `.env` file in the project directory using `env.example` as template
+ - run `docker-compose up database` to get the DB running standlone
+ - run `docker-compose up` to run both the DB and API via containers
+
 ## Running Locally
 
  - create a `.env` file in the project directory using `env.example` as template
