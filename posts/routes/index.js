@@ -11,7 +11,7 @@ router.route('/')
 router.route('/:post')
 	.get($(PostsController.getOnePost))
 	.delete($(PostsController.deletePost))
-	.put(Validator(PostsController.postSchema), $(PostsController.deletePost));
+	.put(Validator(PostsController.postSchema), $(PostsController.updatePost));
 
 
 module.exports = router;

@@ -140,6 +140,9 @@ describe('Posts Controller', () => {
 
 	it('Can update own post', async () => {
 		const req = mockRequest({
+			params: {
+				post: '1234'
+			},
 			body: {
 				post_body: 'post_body is required'
 			},
@@ -150,23 +153,47 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const postSpy = jest.spyOn(Post, 'create').mockResolvedValueOnce({
-			postBody: 'post_body is required',
-			createdBy: '1234'
-		});
+		const postSpy = jest.spyOn(Post, 'edit').mockResolvedValueOnce(true);
 
-		await PostsController.create(req, res, mockNext);
+		await PostsController.updatePost(req, res, mockNext);
 
 		expect(postSpy).toBeCalledWith({
+			post: '1234',
 			postBody: 'post_body is required',
-			createdBy: '1234'
+			user: '1234'
 		});
 
-		expect(res.status).toBeCalledWith(201);
-		expect(res.data).toBeCalledWith({
-			postBody: 'post_body is required',
-			createdBy: '1234'
+		expect(res.status).toBeCalledWith(200);
+		expect(res.data).toBeCalledWith({ updated: true }, 'success');
+	});
+
+	it('Cannot update another user post', async () => {
+		const req = mockRequest({
+			params: {
+				post: '1234'
+			},
+			body: {
+				post_body: 'post_body is required'
+			},
+			user: {
+				id: '1234'
+			}
 		});
+
+		const res = mockResponse();
+
+		const postSpy = jest.spyOn(Post, 'edit').mockResolvedValueOnce(false);
+
+		await PostsController.updatePost(req, res, mockNext);
+
+		expect(postSpy).toBeCalledWith({
+			post: '1234',
+			postBody: 'post_body is required',
+			user: '1234'
+		});
+
+		expect(res.status).toBeCalledWith(400);
+		expect(res.data).toBeCalledWith({ updated: false }, 'error');
 	});
 
 	it('Can delete own post', async () => {
@@ -187,7 +214,35 @@ describe('Posts Controller', () => {
 			postID: '1234',
 			user: '1234'
 		});
+		expect(res.status).toBeCalledWith(200);
 
-		expect(res.data).toBeCalledWith({ deleted: true });
+		expect(res.data).toBeCalledWith({ deleted: true }, 'success');
+	});
+
+	it('Cannot delete another user\'s post', async () => {
+		const req = mockRequest({
+			params: {
+				post: '1234'
+			},
+			user: {
+				id: '1234'
+			}
+		});
+
+		const res = mockResponse();
+
+		const postSpy = jest.spyOn(Post, 'deletePost').mockResolvedValueOnce(false);
+
+		await PostsController.deletePost(req, res, mockNext);
+
+		expect(postSpy).toBeCalledWith({
+			postID: '1234',
+			user: '1234'
+		});
+
+		expect(res.status).toBeCalledWith(400);
+		expect(res.data).toBeCalledWith({
+			deleted: false
+		}, 'error');
 	});
 });

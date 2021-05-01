@@ -15,9 +15,9 @@ const postRoutes = require('./posts/routes');
 
 const customExpress = Object.create(express().response, {
 	data: {
-		value(data) {
+		value(data, status = 'success') {
 			return this.type('json').json({
-				status: 'success',
+				status,
 				data,
 			});
 		},

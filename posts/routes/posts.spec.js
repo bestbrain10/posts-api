@@ -4,6 +4,7 @@ const request = require('supertest');
 const server = require('../../server');
 const database = require('../../database');
 const userSeeder = require('../../__mocks__/user');
+const postSeeder = require('../../__mocks__/post');
 const _ = require('lodash');
 const { v4: uuid } = require('uuid');
 
@@ -15,7 +16,7 @@ describe('Post API', () => {
 	beforeAll(async () => {
 		await database.authenticate();
 		authDetails = await userSeeder({
-            email,
+			email,
 			fullname: 'Steve Rogers'
 		});
 	});
@@ -33,13 +34,223 @@ describe('Post API', () => {
 		});
 
 		it('returns 201 status code', () => {
-            console.log(response.body);
 			expect(response.status).toBe(201);
 		});
 
 		it('returns post details', () => {
 			expect(Object.keys(response.body.data).sort())
-				.toEqual(['email', 'fullname', 'id', 'createdAt', 'updatedAt'].sort());
+				.toEqual(['edited', 'postBody', 'id', 'createdBy', 'createdAt', 'updatedAt'].sort());
+		});
+	});
+
+	describe('Can edit own post', () => {
+		let response;
+		beforeAll(async () => {
+			const { token, id } = authDetails;
+			const { id: postID } = await postSeeder({ postBody: 'something', createdBy: id });
+			response = await request(server).put(`/posts/${postID}`).send({
+				post_body: 'something'
+			}).set('Authorization', `Bearer ${token}`);
+		});
+
+		it('returns 200 status code', () => {
+			expect(response.status).toBe(200);
+		});
+
+		it('returns post details', () => {
+			expect(response.body).toEqual({
+				data: { updated: true },
+				status: 'success'
+			});
+		});
+	});
+
+	describe('Cannot edit another user\'s post', () => {
+		let response;
+		beforeAll(async () => {
+			const { token } = authDetails;
+			const { id } = await userSeeder(); 
+			const { id: postID } = await postSeeder({
+				postBody: 'something',
+				createdBy: id
+			});
+			response = await request(server).put(`/posts/${postID}`).send({
+				post_body: 'something'
+			}).set('Authorization', `Bearer ${token}`);
+		});
+
+		it('returns 400 status code', () => {
+			expect(response.status).toBe(400);
+		});
+
+		it('returns post details', () => {
+			expect(response.body).toEqual({
+				data: {
+					updated: false
+				},
+				status: 'error'
+			});
+		});
+	});
+
+	describe('Can delete post', () => {
+		let response;
+		beforeAll(async () => {
+			const { token, id } = authDetails;
+			const { id: postID } = await postSeeder({
+				postBody: 'something',
+				createdBy: id
+			});
+			response = await request(server).delete(`/posts/${postID}`).set('Authorization', `Bearer ${token}`);
+		});
+
+		it('returns 200 status code', () => {
+			expect(response.status).toBe(200);
+		});
+
+		it('returns delete status', () => {
+			expect(response.body).toEqual({
+				data: {
+					deleted: true
+				},
+				status: 'success'
+			});
+		});
+	});
+
+	describe('Can delete another user\'s post', () => {
+		let response;
+		beforeAll(async () => {
+			const { token } = authDetails;
+			const { id } = await userSeeder();
+			const { id: postID } = await postSeeder({
+				postBody: 'something',
+				createdBy: id
+			});
+			response = await request(server).delete(`/posts/${postID}`).set('Authorization', `Bearer ${token}`);
+		});
+
+		it('returns 400 status code', () => {
+			expect(response.status).toBe(400);
+		});
+
+		it('returns delete status', () => {
+			expect(response.body).toEqual({
+				data: {
+					deleted: false
+				},
+				status: 'error'
+			});
+		});
+	});
+
+	describe('Can fetch a post by ID', () => {
+		let response;
+		let post;
+		beforeAll(async () => {
+			const { token, id } = authDetails;
+			const { id: postID,  } = post = await postSeeder({
+				postBody: 'something',
+				createdBy: id
+			});
+			response = await request(server).get(`/posts/${postID}`).set('Authorization', `Bearer ${token}`);
+		});
+
+		it('returns 200 status code', () => {
+			expect(response.status).toBe(200);
+		});
+
+		it('returns post details', () => {
+			expect(response.body).toMatchObject({
+				data: {
+					...post.toJSON(),
+					createdAt: post.createdAt.toJSON(),
+					updatedAt: post.updatedAt.toJSON()
+				},
+				status: 'success'
+			});
+		});
+	});
+
+	describe('Can fetch all post', () => {
+		let response;
+		beforeAll(async () => {
+			const { token, id } = authDetails;
+			await postSeeder([{
+				postBody: 'something',
+				createdBy: id
+			}, {
+				postBody: 'Domamu I have come to bargain',
+				createdBy: id
+			}, {
+				postBody: 'I am inevitable',
+				createdBy: id
+			}]);
+			response = await request(server).get('/posts?limit=5').set('Authorization', `Bearer ${token}`);
+		});
+
+		it('returns 200 status code', () => {
+			expect(response.status).toBe(200);
+		});
+
+		it('returns post array less than or equal to pagination limit', () => {
+			expect(response.body.data).toHaveProperty('rows');
+			expect(response.body.data.rows).toBeInstanceOf(Array);
+			expect(response.body.data.rows.length).toBeLessThanOrEqual(5);
+		});
+
+		it('returns post details', () => {
+			const expectedKeys = ['postBody', 'createdBy', 'edited', 'id', 'createdAt', 'updatedAt'].sort();
+			
+			expect(response.body.data.rows.every(post => {
+				return !_.difference(Object.keys(post).sort(), expectedKeys).length;
+			}))
+				.toEqual(true);
+		});
+	});
+
+	describe('Can fetch only a user\'s post', () => {
+		let response;
+		let user;
+		beforeAll(async () => {
+			const { id } = user = await userSeeder();
+			await postSeeder([{
+				postBody: 'something',
+				createdBy: id
+			}, {
+				postBody: 'Domamu I have come to bargain',
+				createdBy: id
+			}, {
+				postBody: 'I am inevitable',
+				createdBy: id
+			}]);
+			response = await request(server).get(`/posts?limit=5&user=${id}`).set('Authorization', `Bearer ${authDetails.token}`);
+		});
+
+		it('returns 200 status code', () => {
+			expect(response.status).toBe(200);
+		});
+
+		it('returns post array less than or equal to pagination limit', () => {
+			expect(response.body.data).toHaveProperty('rows');
+			expect(response.body.data.rows).toBeInstanceOf(Array);
+			expect(response.body.data.rows.length).toBeLessThanOrEqual(5);
+		});
+
+		it('return all post belongs to a user', () => {
+			expect(response.body.data.rows.every(post => {
+				return post.createdBy === user.id;
+			}))
+				.toEqual(true);
+		});
+
+		it('returns post details', () => {
+			const expectedKeys = ['postBody', 'createdBy', 'edited', 'id', 'createdAt', 'updatedAt'].sort();
+
+			expect(response.body.data.rows.every(post => {
+				return !_.difference(Object.keys(post).sort(), expectedKeys).length;
+			}))
+				.toEqual(true);
 		});
 	});
 });

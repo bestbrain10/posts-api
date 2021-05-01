@@ -17,7 +17,6 @@ module.exports = {
 			},
 			media: {
 				type: Sequelize.TEXT,
-				allowNull: false
 			},
 			edited: {
 				type: Sequelize.BOOLEAN,

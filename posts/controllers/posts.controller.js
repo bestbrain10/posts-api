@@ -45,7 +45,10 @@ module.exports = class {
 			post: req.params.post
 		});
 
-		res.data({ updated: post });
+		const statusCode = post ? 200 : 400; 
+		const status = post ? 'success' : 'error';
+
+		res.status(statusCode).data({ updated: post }, status);
 	}
 
 	// eslint-disable-next-line no-unused-vars
@@ -55,6 +58,9 @@ module.exports = class {
 			user: req.user.id
 		});
 
-		res.data({ deleted: post });
+		const statusCode = post ? 200 : 400;
+		const status = post ? 'success' : 'error';
+
+		res.status(statusCode).data({ deleted: post }, status);
 	}
 };

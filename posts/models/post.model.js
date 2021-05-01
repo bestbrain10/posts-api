@@ -18,7 +18,7 @@ class Post extends Model {
 			where: {
 				createdBy: user,
 				id: post
-			}
+			},
 		});
 
 		return !!count;
@@ -68,7 +68,7 @@ class Post extends Model {
 			where: {
 				createdBy: user,
 				id: postID
-			}
+			},
 		});
 
 		return !!count;
