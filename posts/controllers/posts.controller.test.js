@@ -245,8 +245,7 @@ describe('Posts Controller', () => {
 		}, 'error');
 	});
 
-	// PostExists middleware does not proceeds to next route if post does not exists
-	// PostExists middleware proceeds to next route if post exists
+
 	it('PostExists middleware does not proceeds to next route if post does not exists', async () => {
 		const req = mockRequest({
 			params: {

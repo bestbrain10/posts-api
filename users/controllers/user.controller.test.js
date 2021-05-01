@@ -26,7 +26,7 @@ describe('User Controller', () => {
 	});
 
 	describe('Find One User By ID', () => {
-		it('It can find a user using query params', async () => {
+		it('It can find a user using URL params', async () => {
 			const req = mockRequest({
 				params: {
 					user: 6,
@@ -49,6 +49,24 @@ describe('User Controller', () => {
 				id: 6,
 				fullname: 'Thor Odinson',
 			});
+
+			expect(findSpy).toBeCalledWith(6);
+		});
+
+		it('returns 404 if user is not found', async () => {
+			const req = mockRequest({
+				params: {
+					user: 6,
+				}
+			});
+			const res = mockResponse();
+
+			const findSpy = jest.spyOn(User, 'findByPk').mockResolvedValueOnce(null);
+
+			await UsersController.getOneUser(req, res, mockNext);
+
+			expect(res.status).toBeCalledWith(404);
+			expect(res.errorMessage).toBeCalledWith('User not found');
 
 			expect(findSpy).toBeCalledWith(6);
 		});

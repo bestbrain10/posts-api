@@ -94,4 +94,16 @@ describe('Reply Model', () => {
 			}
 		});
 	});
+
+	it('can fetch reply by ID', async () => {
+		const replySpy = jest.spyOn(Reply, 'findByPk').mockResolvedValueOnce({
+			replyBody: 'hello'
+		});
+
+		const result = await Reply.fetchReply('456');
+		expect(result).toEqual({
+			replyBody: 'hello'
+		});
+		expect(replySpy).toBeCalledWith('456');
+	});
 });

@@ -1,5 +1,6 @@
 const User = require('./user.model');
 const { omit } = require('lodash');
+const hashPassword = require('../../common/utils/hash-password');
 
 
 describe('User Model', () => {
@@ -128,6 +129,67 @@ describe('User Model', () => {
 			expect(compareSpy).toBeCalledWith(loginParams.password);
 
 			expect(result).toMatchObject(omit(user, ['password']));
+		});
+	});
+
+	describe('Password', () =>  {
+		it('Can compare password with wrong password, returns false', () => {
+			const user = new User({ password: 'hello' });
+
+			expect(user.comparePassword('hello')).toEqual(false);
+		});
+
+		it('Can compare password with correct password, returns true', () => {
+			const user = new User({
+				password: hashPassword('hello')
+			});
+
+			expect(user.comparePassword('hello')).toEqual(true);
+		});
+
+		it('Can change password', async () => {
+			const updateSpy = jest.spyOn(User, 'update').mockResolvedValueOnce([1]);
+			const userID = '123';
+			const password = 'password';
+			const newPassword = 'newPassword';
+
+			const result = await User.changePassword({ userID, password, newPassword });
+
+			expect(result).toEqual(true);
+			expect(updateSpy).toBeCalledWith({
+				password: hashPassword(newPassword)
+			}, {
+				where: {
+					password: hashPassword(password),
+					id: userID
+				}
+			});
+		});
+
+		it('Can change password if old password is wrong', async () => {
+			const updateSpy = jest.spyOn(User, 'update').mockResolvedValueOnce([0]);
+			const userID = '123';
+			const password = 'password';
+			const newPassword = 'newPassword';
+
+			try {
+				await User.changePassword({
+					userID,
+					password,
+					newPassword
+				});
+			} catch(e) {
+				expect(e).toEqual({ password: 'Incorrect password' });
+				expect(updateSpy).toBeCalledWith({
+					password: hashPassword(newPassword)
+				}, {
+					where: {
+						password: hashPassword(password),
+						id: userID
+					}
+				});
+			}
+
 		});
 	});
 });

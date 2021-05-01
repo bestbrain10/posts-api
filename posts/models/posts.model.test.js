@@ -85,4 +85,14 @@ describe('Post Model', () => {
 			}
 		});
 	});
+
+	it('can fetch post by ID', async () => {
+		const postSpy = jest.spyOn(Post, 'findByPk').mockResolvedValueOnce({ postBody: 'hello' });
+
+		const result = await Post.fetchPost('456');
+		expect(result).toEqual({
+			postBody: 'hello'
+		});
+		expect(postSpy).toBeCalledWith('456');
+	});
 });
