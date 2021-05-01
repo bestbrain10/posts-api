@@ -72,4 +72,17 @@ describe('Post Model', () => {
 			}
 		});
 	});
+
+	it('checks if post exists', async () => {
+		const postSpy = jest.spyOn(Post, 'count').mockResolvedValueOnce(3);
+
+		const result = await Post.exists('456');
+
+		expect(result).toEqual(true);
+		expect(postSpy).toBeCalledWith({
+			where: {
+				id: '456'
+			}
+		});
+	});
 });

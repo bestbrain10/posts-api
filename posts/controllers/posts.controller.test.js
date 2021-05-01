@@ -244,4 +244,46 @@ describe('Posts Controller', () => {
 			deleted: false
 		}, 'error');
 	});
+
+	// PostExists middleware does not proceeds to next route if post does not exists
+	// PostExists middleware proceeds to next route if post exists
+	it('PostExists middleware does not proceeds to next route if post does not exists', async () => {
+		const req = mockRequest({
+			params: {
+				post: '1234'
+			},
+		});
+
+		const res = mockResponse();
+
+		const postSpy = jest.spyOn(Post, 'exists').mockResolvedValueOnce(false);
+
+		await PostsController.postExists(req, res, mockNext);
+
+		expect(postSpy).toBeCalledWith('1234');
+
+		expect(res.status).toBeCalledWith(404);
+		expect(res.error).toBeCalledWith({
+			post: 'post does not exist'
+		});
+	});
+
+	it('PostExists middleware proceeds to next route if post exists', async () => {
+		const req = mockRequest({
+			params: {
+				post: '1234'
+			},
+		});
+
+		const res = mockResponse();
+		const next = jest.fn();
+
+		const postSpy = jest.spyOn(Post, 'exists').mockResolvedValueOnce(true);
+
+		await PostsController.postExists(req, res, next);
+
+		expect(postSpy).toBeCalledWith('1234');
+
+		expect(next).toBeCalled();
+	});
 });
