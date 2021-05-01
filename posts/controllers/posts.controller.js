@@ -36,6 +36,16 @@ module.exports = class {
 		res.data( post );
 	}
 
+	static async postExists(req, res, next) {
+		const post = await Post.exists(req.params.post);
+
+		if(!post) {
+			return res.status(404).error({ post: 'post does not exist' });
+		}
+
+		next();
+	}
+
 
 	// eslint-disable-next-line no-unused-vars
 	static async updatePost(req, res, next) {

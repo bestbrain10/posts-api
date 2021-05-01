@@ -74,6 +74,20 @@ class Post extends Model {
 		return !!count;
 	}
 	
+	/**
+	 * checks if a post exists using its ID
+	 * @param {string} postID 
+	 * @returns 
+	 */
+	static async exists(postID) {
+		const post = await Post.count({
+			where: {
+				id: postID
+			}
+		});
+
+		return !!post;
+	}
 }
 
 Post.init({

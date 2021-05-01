@@ -1,5 +1,4 @@
 
-require('dotenv').config();
 
 const { mockNext, mockRequest, mockResponse } = require('../../__mocks__/http');
 const PostsController = require('./posts.controller');
