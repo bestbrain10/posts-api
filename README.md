@@ -1,5 +1,7 @@
 # posts-api
+[![Test](https://github.com/bestbrain10/posts-api/actions/workflows/pipeline.yml/badge.svg)](https://github.com/bestbrain10/posts-api/actions/workflows/pipeline.yml)
 Simple Facebook Posts API
+
 
 ## API Documentation
 

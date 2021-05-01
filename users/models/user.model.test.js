@@ -1,6 +1,9 @@
 const User = require('./user.model');
 const { omit } = require('lodash');
 const hashPassword = require('../../common/utils/hash-password');
+const Email = require('../../emails');
+jest.mock('../../emails');
+const jwt = require('../../common/utils/jwt');
 
 
 describe('User Model', () => {
@@ -51,6 +54,15 @@ describe('User Model', () => {
 				where: {
 					email: registerParams.email
 				},
+			});
+
+			expect(Email).toBeCalledWith({
+				data: {
+					fullname: registerParams.fullname,
+				},
+				subject: 'Welcome onboard!',
+				email: registerParams.email,
+				template: 'welcome'
 			});
 
 			expect(createSpy).toBeCalledWith(registerParams);
@@ -190,6 +202,133 @@ describe('User Model', () => {
 				});
 			}
 
+		});
+
+		it('it decodes the input token returns the userID if valid', () => {
+			const jwtSpy = jest.spyOn(jwt, 'decode');
+			jwtSpy.mockReturnValueOnce({
+				user: 56
+			});
+
+			const result = User.validatePasswordResetToken('jibberish');
+			expect(jwtSpy).toBeCalledWith('jibberish');
+			expect(result).toBe(56);
+		});
+
+
+		it('returns error if user is not found in decoded payload', async () => {
+			const jwtSpy = jest.spyOn(jwt, 'decode');
+			jwtSpy.mockReturnValueOnce({
+				location: 'Asgard'
+			});
+
+			try {
+				await User.validatePasswordResetToken('jibberish');
+			}catch(e) {
+				expect(jwtSpy).toBeCalledWith('jibberish');
+				expect(e).toBe('invalid password reset token');
+			}
+		});
+
+
+		it('returns error if error occured will decoding', async () => {
+			const jwtSpy = jest.spyOn(jwt, 'decode');
+			jwtSpy.mockImplementationOnce(() => {
+				throw new Error('Cannot decode for some reason');
+			});
+
+			try {
+				await User.validatePasswordResetToken('jibberish');
+			} catch(e) {
+				expect(jwtSpy).toBeCalledWith('jibberish');
+				expect(e).toBe('invalid password reset token');
+			}
+
+		});
+
+		it('Can request for password reset', async () => {
+			const token = 'stuffJustEncoded';
+			const findSpy = jest.spyOn(User, 'findOne').mockResolvedValueOnce({ fullname: 'Scott Lang', id: '5456' });
+			const encodeSpy = jest.spyOn(jwt, 'encode').mockReturnValue(token);
+			const email = 'antman@avengers.com';
+			const result = await User.requestPasswordReset(email);
+			expect(result).toEqual(true);
+			expect(findSpy).toBeCalledWith({ where: { email } });
+			expect(encodeSpy).toBeCalledWith({
+				user: '5456',
+				exp: Math.floor(Date.now() / 1000) + (60 * 60)
+			});
+			expect(Email).toBeCalledWith({
+				data: {
+					fullname: 'Scott Lang',
+					token
+				},
+				subject: 'Reset Password',
+				email,
+				template: 'reset-password'
+			});
+		});
+
+		it('Password reset request for non-existing user returns error', async () => {
+			const findSpy = jest.spyOn(User, 'findOne').mockResolvedValueOnce(null);
+
+			const email = 'thanos@avengers.com';
+			try {
+				await User.requestPasswordReset(email);
+			}catch(e) {
+				expect(e).toEqual({
+					email: 'User account does not exist'
+				});
+				expect(findSpy).toBeCalledWith({
+					where: {
+						email
+					}
+				});
+			}
+		});
+
+		it('Can reset password', async () => {
+			const updateSpy = jest.spyOn(User, 'update').mockResolvedValue([1]);
+			const token = 'infinity stones';
+			const password = 'Gamora';
+			const userID = '234';
+			const decodeSpy = jest.spyOn(User, 'validatePasswordResetToken').mockResolvedValue(userID);
+
+			const result = await User.resetPassword({ token, password });
+			expect(updateSpy).toBeCalledWith({
+				password: hashPassword(password)
+			}, {
+				where: {
+					id: userID
+				}
+			});
+			expect(decodeSpy).toBeCalledWith(token);
+			expect(result).toEqual(true);
+		});
+
+		it('Cannot reset password if user in token does not exist', async () => {
+			const updateSpy = jest.spyOn(User, 'update').mockResolvedValue([0]);
+			const token = 'infinity stones';
+			const password = 'Gamora';
+			const userID = '234';
+			const decodeSpy = jest.spyOn(User, 'validatePasswordResetToken').mockResolvedValue(userID);
+
+			try {
+				await User.resetPassword({
+					token,
+					password
+				});
+			}catch(e) {
+				expect(updateSpy).toBeCalledWith({
+					password: hashPassword(password)
+				}, {
+					where: {
+						id: userID
+					}
+				});
+				expect(decodeSpy).toBeCalledWith(token);
+				expect(e).toEqual('User account does not exist');
+			}
 		});
 	});
 });

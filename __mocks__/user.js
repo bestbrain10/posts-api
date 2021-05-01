@@ -10,7 +10,7 @@ module.exports = async ({ fullname = 'Anon Avenger', email, password = 'password
 		email,
 		password,
 		fullname
-	});
+	}, false);
 	const user = await User.login({
 		email,
 		password
