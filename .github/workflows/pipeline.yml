@@ -1,4 +1,4 @@
-name: Test and Deploy
+name: Test
 
 on:
   push:
@@ -35,40 +35,3 @@ jobs:
         run: echo "${{secrets.CI_ENV}}" > .env
       - name: Run integration tests
         run: DB_PORT=5432 docker-compose up --exit-code-from restapi
-
-
-  setup:
-    needs: integration
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Add production ENV variables for migration
-        run: echo "${{secrets.ENV}}" > .env
-      - name: Reinstall node_modules
-        run: npm ci
-      - name: Run migrations
-        run: npm run migrate:run
-      - name: Clean up coverage
-        run:  rm -rf coverage
-      - name: Remove Test files
-        run: |
-          find . -type f -name '*.test.js' -delete
-          rm -rf __mocks__
-          rm -rf __tests__
-          rm -rf jest.config.json
-          rm -rf jest-e2e.config.json
-          rm -rf Dockerfile
-          rm -rf docker-compose.yml
-
-
-
-  deploy:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "transaction-runner-liv"
-          heroku_email: ${{secrets.DEPLOY_EMAIL}}
