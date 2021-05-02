@@ -101,6 +101,16 @@ Post.init({
 		type: DataTypes.UUID,
 		allowNull: false
 	},
+	media: {
+		type: DataTypes.TEXT,
+	},
+	mediaLink: {
+		type: new DataTypes.VIRTUAL(DataTypes.BOOLEAN, ['media']),
+		get: function() {
+			const path = `${(process.env.API_URL || '')}/uploads/`;
+			return `${path}${this.get('media')}`;
+		}
+	},
 	postBody: {
 		type: DataTypes.TEXT,
 		allowNull: false

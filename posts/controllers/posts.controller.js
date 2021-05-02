@@ -12,6 +12,7 @@ module.exports = class {
 	// eslint-disable-next-line no-unused-vars
 	static async create(req, res, next) {
 		const post = await Post.create({
+			...(req.file && { media: req.file.filename }),
 			postBody: req.body.post_body,
 			createdBy: req.user.id
 		});
@@ -50,6 +51,7 @@ module.exports = class {
 	// eslint-disable-next-line no-unused-vars
 	static async updatePost(req, res, next) {
 		const post = await Post.edit({
+			...(req.file && { media: req.file.filename }),
 			postBody: req.body.post_body,
 			user: req.user.id,
 			post: req.params.post

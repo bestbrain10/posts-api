@@ -7,7 +7,7 @@ const userSeeder = require('../../__mocks__/user');
 const postSeeder = require('../../__mocks__/post');
 const _ = require('lodash');
 const { v4: uuid } = require('uuid');
-
+const postProperties = ['edited', 'media', 'mediaLink', 'postBody', 'id', 'createdBy', 'createdAt', 'updatedAt'];
 
 const email = `steve${uuid()}@avengers.com`;
 
@@ -39,7 +39,47 @@ describe('Post API', () => {
 
 		it('returns post details', () => {
 			expect(Object.keys(response.body.data).sort())
-				.toEqual(['edited', 'postBody', 'id', 'createdBy', 'createdAt', 'updatedAt'].sort());
+				.toEqual(postProperties.sort());
+		});
+	});
+
+	describe('Only images can be uploaded when creating post', () => {
+		let response;
+		beforeAll(async () => {
+			const { token } = authDetails;
+			response = await request(server).post('/posts').field({
+				post_body: 'something'
+			}).attach('media', '__mocks__/http.js').set('Authorization', `Bearer ${token}`);
+		});
+
+		it('returns 400 status code', () => {
+			expect(response.status).toBe(400);
+		});
+
+		it('returns error message', () => {
+			expect(response.body).toEqual({
+				message: 'media only supports image file upload',
+				status: 'error'
+			});
+		});
+	});
+
+	describe('Can create post with image', () => {
+		let response;
+		beforeAll(async () => {
+			const { token } = authDetails;
+			response = await request(server).post('/posts').field({
+				post_body: 'something'
+			}).attach('media', '__mocks__/ironman.jpg').set('Authorization', `Bearer ${token}`);
+		});
+
+		it('returns 201 status code', () => {
+			expect(response.status).toBe(201);
+		});
+
+		it('returns post details', () => {
+			expect(Object.keys(response.body.data).sort())
+				.toEqual(postProperties.sort());
 		});
 	});
 
@@ -51,6 +91,28 @@ describe('Post API', () => {
 			response = await request(server).put(`/posts/${postID}`).send({
 				post_body: 'something'
 			}).set('Authorization', `Bearer ${token}`);
+		});
+
+		it('returns 200 status code', () => {
+			expect(response.status).toBe(200);
+		});
+
+		it('returns post details', () => {
+			expect(response.body).toEqual({
+				data: { updated: true },
+				status: 'success'
+			});
+		});
+	});
+
+	describe('Can edit own post with image', () => {
+		let response;
+		beforeAll(async () => {
+			const { token, id } = authDetails;
+			const { id: postID } = await postSeeder({ postBody: 'something', createdBy: id });
+			response = await request(server).put(`/posts/${postID}`).field({
+				post_body: 'something'
+			}).attach('media', '__mocks__/ironman.jpg').set('Authorization', `Bearer ${token}`);
 		});
 
 		it('returns 200 status code', () => {
@@ -83,7 +145,7 @@ describe('Post API', () => {
 			expect(response.status).toBe(400);
 		});
 
-		it('returns post details', () => {
+		it('returns error message', () => {
 			expect(response.body).toEqual({
 				data: {
 					updated: false
@@ -200,7 +262,7 @@ describe('Post API', () => {
 		});
 
 		it('returns post details', () => {
-			const expectedKeys = ['postBody', 'createdBy', 'edited', 'id', 'createdAt', 'updatedAt'].sort();
+			const expectedKeys = postProperties.sort();
 			
 			expect(response.body.data.rows.every(post => {
 				return !_.difference(Object.keys(post).sort(), expectedKeys).length;
@@ -245,7 +307,7 @@ describe('Post API', () => {
 		});
 
 		it('returns post details', () => {
-			const expectedKeys = ['postBody', 'createdBy', 'edited', 'id', 'createdAt', 'updatedAt'].sort();
+			const expectedKeys = postProperties.sort();
 
 			expect(response.body.data.rows.every(post => {
 				return !_.difference(Object.keys(post).sort(), expectedKeys).length;

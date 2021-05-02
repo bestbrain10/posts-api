@@ -59,6 +59,41 @@ describe('Posts Controller', () => {
 		});
 	});
 
+	it('appends file to body during when creating post, if file is present', async () => {
+		const req = mockRequest({
+			body: {
+				post_body: 'post_body is required'
+			},
+			user: {
+				id: '1234'
+			},
+			file: {
+				filename: 'file-path' ,
+			}
+		});
+
+		const res = mockResponse();
+
+		const postSpy = jest.spyOn(Post, 'create').mockResolvedValueOnce({
+			postBody: 'post_body is required',
+			createdBy: '1234'
+		});
+
+		await PostsController.create(req, res, mockNext);
+
+		expect(postSpy).toBeCalledWith({
+			media: 'file-path',
+			postBody: 'post_body is required',
+			createdBy: '1234'
+		});
+
+		expect(res.status).toBeCalledWith(201);
+		expect(res.data).toBeCalledWith({
+			postBody: 'post_body is required',
+			createdBy: '1234'
+		});
+	});
+
 	it('Can fetch a single post', async () => {
 		const req = mockRequest({
 			params: { post: '1234' }
@@ -158,6 +193,39 @@ describe('Posts Controller', () => {
 
 		expect(postSpy).toBeCalledWith({
 			post: '1234',
+			postBody: 'post_body is required',
+			user: '1234'
+		});
+
+		expect(res.status).toBeCalledWith(200);
+		expect(res.data).toBeCalledWith({ updated: true }, 'success');
+	});
+
+	it('appends file to body during when updating post, if file is present', async () => {
+		const req = mockRequest({
+			params: {
+				post: '1234'
+			},
+			body: {
+				post_body: 'post_body is required'
+			},
+			user: {
+				id: '1234'
+			},
+			file: {
+				filename: 'updated-pic'
+			}
+		});
+
+		const res = mockResponse();
+
+		const postSpy = jest.spyOn(Post, 'edit').mockResolvedValueOnce(true);
+
+		await PostsController.updatePost(req, res, mockNext);
+
+		expect(postSpy).toBeCalledWith({
+			post: '1234',
+			media: 'updated-pic',
 			postBody: 'post_body is required',
 			user: '1234'
 		});
@@ -285,4 +353,5 @@ describe('Posts Controller', () => {
 
 		expect(next).toBeCalled();
 	});
+
 });

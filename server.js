@@ -51,6 +51,7 @@ app.response = Object.create(customExpress);
 app.all('/', indexRoute);
 app.use(authRoutes);
 app.use('/users', authMiddleware, userRoutes);
+app.use('/uploads', express.static('uploads'));
 app.use('/posts', authMiddleware, postRoutes);
 
 
