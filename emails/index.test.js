@@ -1,8 +1,8 @@
 
-process.env = { stuff: 'rando rando' };
+process.env = { stuff: 'rando rando', NODE_ENV: 'development' };
 const emailUtil = require('./index');
-const mailJet = require('../common/utils/mailjet');
-jest.mock('../common/utils/mailjet');
+const mailClient = require('../common/utils/aws-ses');
+jest.mock('../common/utils/aws-ses');
 const ejs = require('ejs');
 
 describe('Email Utility', () => {
@@ -37,7 +37,7 @@ describe('Email Utility', () => {
 			prop: 'value'
 		});
 
-		expect(mailJet).toBeCalledWith({
+		expect(mailClient).toBeCalledWith({
 			body: 'stuff to send',
 			email: 'test@email.com',
 			subject: 'Subject',
@@ -64,7 +64,7 @@ describe('Email Utility', () => {
 			prop: 'value'
 		});
 
-		expect(mailJet).toBeCalledWith({
+		expect(mailClient).toBeCalledWith({
 			body: 'stuff to send',
 			email: 'test@email.com',
 			subject: 'Subject',

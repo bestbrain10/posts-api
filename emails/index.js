@@ -1,4 +1,4 @@
-const mailJet = require('../common/utils/mailjet');
+const awsUtil = require('../common/utils/aws-ses');
 const fs = require('fs');
 const ejs = require('ejs');
 
@@ -13,16 +13,18 @@ module.exports = async ({ data, email, subject, template, name }) => {
 			...process.env,
 			...data
 		});
-		await mailJet({
+		await awsUtil({
 			body,
 			email,
 			subject,
 			name
 		});
 	} catch(e) {
-		// eslint-disable-next-line no-console
-		console.log('Mail Error');
-		// eslint-disable-next-line no-console
-		console.log(e);
+		if (!['ci', 'test'].includes(process.env.NODE_ENV)) {
+			// eslint-disable-next-line no-console
+			console.log('Mail Error');
+			// eslint-disable-next-line no-console
+			console.log(e);
+		}
 	}
 };

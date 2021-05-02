@@ -1,40 +1,49 @@
-const { Model, DataTypes, } = require('sequelize');
+const {
+	Model,
+	DataTypes,
+} = require('sequelize');
 const hashPassword = require('../../common/utils/hash-password');
 const DB = require('../../database');
-const { omit } = require('lodash');
+const {
+	omit
+} = require('lodash');
 const jwt = require('../../common/utils/jwt');
 const Email = require('../../emails');
 
 class User extends Model {
 
 	/**
-     * compares input password with stored hash
-     * @param {string} inputPassword 
-     * @returns 
-     */
+	 * compares input password with stored hash
+	 * @param {string} inputPassword 
+	 * @returns 
+	 */
 	comparePassword(inputPassword) {
 		return this.password === hashPassword(inputPassword);
 	}
 
 
 	/**
-     * Registers a new user, makes sure email is unique
-     * @param {object} user 
-     * @returns 
-     */
+	 * Registers a new user, makes sure email is unique
+	 * @param {object} user 
+	 * @returns 
+	 */
 	static async register(user, sendMail = true) {
 		const emailExists = await this.count({
-			where: { email: user.email },
+			where: {
+				email: user.email
+			},
 		});
 
-		if(emailExists) {
-			return Promise.reject({ email: 'Email already exists' });
+		if (emailExists) {
+			return Promise.reject({
+				email: 'Email already exists'
+			});
 		}
 
-		const newUser =  await this.create(user);
+		const newUser = await this.create(user);
 
-		if(sendMail) {
-			Email({
+		if (sendMail) {
+			await Email({
 				data: {
 					fullname: user.fullname,
 				},
@@ -48,13 +57,16 @@ class User extends Model {
 	}
 
 	/**
-     * Logs in a user, checks for password and email correctness
-     * @param {object} loginParams
+	 * Logs in a user, checks for password and email correctness
+	 * @param {object} loginParams
 	 * @param {string} loginParams.email
 	 * @param {string} loginParams.password 
-     * @returns 
-     */
-	static async login({ email, password }) {
+	 * @returns 
+	 */
+	static async login({
+		email,
+		password
+	}) {
 		const user = await this.scope('withPassword').findOne({
 			where: {
 				email
@@ -62,11 +74,15 @@ class User extends Model {
 		});
 
 		if (!user) {
-			return Promise.reject({ email: 'Email does not exist' });
+			return Promise.reject({
+				email: 'Email does not exist'
+			});
 		}
 
-		if(!user.comparePassword(password)) {
-			return Promise.reject({ password: 'Incorrect password' });            
+		if (!user.comparePassword(password)) {
+			return Promise.reject({
+				password: 'Incorrect password'
+			});
 		}
 
 		return omit(user.toJSON(), ['password']);
@@ -80,8 +96,12 @@ class User extends Model {
 	 * @param {string} param.newPassword user's new password
 	 * @returns Promise<boolean|object>
 	 */
-	static async changePassword({ userID, password, newPassword }) {
-		const [ count ] = await this.update({
+	static async changePassword({
+		userID,
+		password,
+		newPassword
+	}) {
+		const [count] = await this.update({
 			password: hashPassword(newPassword)
 		}, {
 			where: {
@@ -90,8 +110,10 @@ class User extends Model {
 			}
 		});
 
-		if(!count) {
-			return Promise.reject({ password: 'Incorrect password' });
+		if (!count) {
+			return Promise.reject({
+				password: 'Incorrect password'
+			});
 		}
 
 		return true;
@@ -105,7 +127,10 @@ class User extends Model {
 	 * @param {string} param.password 
 	 * @returns 
 	 */
-	static async resetPassword({ token, password }) {
+	static async resetPassword({
+		token,
+		password
+	}) {
 
 		const userID = await this.validatePasswordResetToken(token);
 
@@ -131,20 +156,29 @@ class User extends Model {
 	 * @returns 
 	 */
 	static async requestPasswordReset(email, sendMail = true) {
-		const user = await this.findOne({ where: { email } });
+		const user = await this.findOne({
+			where: {
+				email
+			}
+		});
 
-		if(!user) {
-			return Promise.reject({ email: 'User account does not exist' });
+		if (!user) {
+			return Promise.reject({
+				email: 'User account does not exist'
+			});
 		}
 
-		const token = jwt.encode({ 
-			user: user.id,  
+		const token = jwt.encode({
+			user: user.id,
 			exp: Math.floor(Date.now() / 1000) + (60 * 60),
 		});
-		
-		if(sendMail) {
-			Email({
-				data: { fullname: user.fullname, token },
+
+		if (sendMail) {
+			await Email({
+				data: {
+					fullname: user.fullname,
+					token
+				},
 				subject: 'Reset Password',
 				email,
 				template: 'reset-password'
@@ -167,7 +201,9 @@ class User extends Model {
 			}
 			return decoded.user;
 		} catch (e) {
-			return Promise.reject('invalid password reset token');
+			const tokenExpired = e && e.name && e.name == 'TokenExpiredError';
+			const message = tokenExpired ? 'token expired, try requesting for another one' : 'invalid password reset token';
+			return Promise.reject(message);
 		}
 	}
 }
@@ -196,10 +232,14 @@ User.init({
 	underscored: true,
 	timestamps: true,
 	defaultScope: {
-		attributes: { exclude: ['password'] }
+		attributes: {
+			exclude: ['password']
+		}
 	},
-	scopes: { 
-		withPassword: { attributes: {} }
+	scopes: {
+		withPassword: {
+			attributes: {}
+		}
 	},
 	sequelize: DB
 });
