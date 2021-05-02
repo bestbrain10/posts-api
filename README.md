@@ -5,6 +5,7 @@ Simple Facebook Posts API
 
 ## API Documentation
 
+https://documenter.getpostman.com/view/2210503/TzRLmqmq
 
 ## How to Install NodeJS and Git
 

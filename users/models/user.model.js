@@ -1,12 +1,7 @@
-const {
-	Model,
-	DataTypes,
-} = require('sequelize');
+const { Model, DataTypes, } = require('sequelize');
 const hashPassword = require('../../common/utils/hash-password');
 const DB = require('../../database');
-const {
-	omit
-} = require('lodash');
+const { omit } = require('lodash');
 const jwt = require('../../common/utils/jwt');
 const Email = require('../../emails');
 
