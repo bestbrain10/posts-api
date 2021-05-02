@@ -21,39 +21,6 @@ https://documenter.getpostman.com/view/2210503/TzRLmqmq
 
     - `npm install`
 
-## How to install Postgres
-
-- Visit https://www.postgresql.org/download/ on your browser to downoad Postgres. 
-- After the download is complete, select your operating system and follow instructions to complete the installations
-- To start postgres on your computer follow instructions on this website: https://tableplus.com/blog/2018/10/how-to-start-stop-restart-postgresql-server.html
-
-## Setting up the database
-
-- I used `facebook-posts` as the database name (`<database>`) when developing so you can use it or any name of your choice
-
-- Open your CLI, run `createdb <database>` to create a database with default username and password (`postgres`)
-
-## Alternatively use Docker
-The database and API are already containerized to enable anyone setup quickly.
-
- - Install docker on your laptop using https://docs.docker.com/engine/install/
- - Once installation is complete, navigate to the project directory (post-api)
- - create a `.env` file in the project directory using `env.example` as template
- - run `docker-compose up database` to get the DB running standlone
- - run `docker-compose up` to run both the DB and API via containers
-
-## Running Locally
-
- - create a `.env` file in the project directory using `env.example` as template
-
- - run `npm run migrate:run` to setup the database
-
- - Run `npm run start` to start the server
-
- - From your browser or REST client visit `http://localhost:3000` 
-
- - If you make any changes, you will have to first close the running server, save the file you made changes to and then start the server again using `npm run start`
-
 ## Creating AWS Credentials
 
 Core to this project is emailing and I use AWS SES to send email to users. 
@@ -90,6 +57,42 @@ Once in the console use the following steps to get the credentials for using AWS
 Based on where you are in the world, AWS has a region (group of data centers) located somewhat close to you and it is best practice to use the closest region to you. The closest region to me from Nigeria is Cape Town (af-south-1).
 
 Find the region closest to you and put in the region code in your .env file. For me it is `REGION=af-south-1`
+
+
+
+## How to install Postgres
+
+- Visit https://www.postgresql.org/download/ on your browser to downoad Postgres. 
+- After the download is complete, select your operating system and follow instructions to complete the installations
+- To start postgres on your computer follow instructions on this website: https://tableplus.com/blog/2018/10/how-to-start-stop-restart-postgresql-server.html
+
+## Setting up the database
+
+- I used `facebook-posts` as the database name (`<database>`) when developing so you can use it or any name of your choice
+
+- Open your CLI, run `createdb <database>` to create a database with default username and password (`postgres`)
+
+## Alternatively use Docker
+The database and API are already containerized to enable anyone setup quickly.
+
+ - Install docker on your laptop using https://docs.docker.com/engine/install/
+ - Once installation is complete, navigate to the project directory (post-api)
+ - create a `.env` file in the project directory using `env.example` as template
+ - run `docker-compose up database` to get the DB running standlone
+ - run `docker-compose up` to run both the DB and API via containers
+
+## Running Locally
+
+ - create a `.env` file in the project directory using `env.example` as template
+
+ - run `npm run migrate:run` to setup the database
+
+ - Run `npm run start` to start the server
+
+ - From your browser or REST client visit `http://localhost:3000` 
+
+ - If you make any changes, you will have to first close the running server, save the file you made changes to and then start the server again using `npm run start`
+
 
 
 ## Running Unit Test
