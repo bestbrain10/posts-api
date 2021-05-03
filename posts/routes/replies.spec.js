@@ -70,7 +70,7 @@ describe('Post API', () => {
 
 		it('returns post details', () => {
 			expect(Object.keys(response.body.data).sort())
-				.toEqual(replyProps.sort());
+				.toEqual(replyProps.filter(prop => !['user'].includes(prop)).sort());
 		});
 	});
 

@@ -9,6 +9,7 @@ const postSeeder = require('../../__mocks__/post');
 const _ = require('lodash');
 const { v4: uuid } = require('uuid');
 const postProperties = ['edited', 'user' , 'media', 'mediaLink', 'postBody', 'id', 'createdBy', 'createdAt', 'updatedAt'];
+const nonCreateProperties = ['user'];
 
 const email = `steve${uuid()}@avengers.com`;
 
@@ -40,7 +41,7 @@ describe('Post API', () => {
 
 		it('returns post details', () => {
 			expect(Object.keys(response.body.data).sort())
-				.toEqual(postProperties.sort());
+				.toEqual(postProperties.filter(prop => !nonCreateProperties.includes(prop)).sort());
 		});
 	});
 
@@ -80,7 +81,7 @@ describe('Post API', () => {
 
 		it('returns post details', () => {
 			expect(Object.keys(response.body.data).sort())
-				.toEqual(postProperties.sort());
+				.toEqual(postProperties.filter(prop => !nonCreateProperties.includes(prop)).sort().sort());
 		});
 	});
 
