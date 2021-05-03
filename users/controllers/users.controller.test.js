@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const { mockNext, mockRequest, mockResponse } = require('../../__mocks__/http');
-const UsersController = require('./user.controller');
+const UsersController = require('./users.controller');
 const User = require('../models/user.model');
 const joiValidator = require('../../common/utils/joi-validator');
 
