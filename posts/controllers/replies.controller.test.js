@@ -1,6 +1,6 @@
 const { mockNext, mockRequest, mockResponse } = require('../../__mocks__/http');
 const RepliesController = require('./replies.controller');
-const Reply = require('../models/reply.model');
+const ReplyRepository = require('../repositories/replies.repository');
 const joiValidator = require('../../common/utils/joi-validator');
 
 describe('Posts Controller', () => {
@@ -41,7 +41,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const replySpy = jest.spyOn(Reply, 'create').mockResolvedValueOnce({
+		const replySpy = jest.spyOn(ReplyRepository, 'create').mockResolvedValueOnce({
 			replyBody: 'reply_body is required',
 			createdBy: '1234'
 		});
@@ -70,7 +70,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const replySpy = jest.spyOn(Reply, 'fetchReply').mockResolvedValueOnce({
+		const replySpy = jest.spyOn(ReplyRepository, 'fetchReply').mockResolvedValueOnce({
 			id: '1234',
 			replyBody: 'reply_body is required',
 			createdBy: '1234'
@@ -94,7 +94,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const replySpy = jest.spyOn(Reply, 'fetchReplies').mockResolvedValueOnce([{
+		const replySpy = jest.spyOn(ReplyRepository, 'fetchReplies').mockResolvedValueOnce([{
 			id: '1234',
 			replyBody: 'reply_body is required',
 			createdBy: '1234'
@@ -128,7 +128,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const replySpy = jest.spyOn(Reply, 'fetchReplies').mockResolvedValueOnce([{
+		const replySpy = jest.spyOn(ReplyRepository, 'fetchReplies').mockResolvedValueOnce([{
 			id: '1234',
 			replyBody: 'reply_body is required',
 			createdBy: '1234'
@@ -166,7 +166,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const replySpy = jest.spyOn(Reply, 'edit').mockResolvedValueOnce(true);
+		const replySpy = jest.spyOn(ReplyRepository, 'edit').mockResolvedValueOnce(true);
 
 		await RepliesController.updateReply(req, res, mockNext);
 
@@ -199,7 +199,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const replySpy = jest.spyOn(Reply, 'edit').mockResolvedValueOnce(false);
+		const replySpy = jest.spyOn(ReplyRepository, 'edit').mockResolvedValueOnce(false);
 
 		await RepliesController.updateReply(req, res, mockNext);
 
@@ -229,7 +229,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const replySpy = jest.spyOn(Reply, 'deleteReply').mockResolvedValueOnce(true);
+		const replySpy = jest.spyOn(ReplyRepository, 'deleteReply').mockResolvedValueOnce(true);
 
 		await RepliesController.deleteReply(req, res, mockNext);
 
@@ -258,7 +258,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const postSpy = jest.spyOn(Reply, 'deleteReply').mockResolvedValueOnce(false);
+		const postSpy = jest.spyOn(ReplyRepository, 'deleteReply').mockResolvedValueOnce(false);
 
 		await RepliesController.deleteReply(req, res, mockNext);
 

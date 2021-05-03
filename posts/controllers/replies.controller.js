@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const Reply = require('../models/reply.model');
+const ReplyRepository = require('../repositories/replies.repository');
 
 
 module.exports = class {
@@ -11,7 +11,7 @@ module.exports = class {
 
 	// eslint-disable-next-line no-unused-vars
 	static async createReply(req, res, next) {
-		const reply = await Reply.create({
+		const reply = await ReplyRepository.create({
 			replyBody: req.body.reply_body,
 			postId: req.params.post,
 			createdBy: req.user.id
@@ -23,7 +23,7 @@ module.exports = class {
 	static async getAllReplies(req, res, next) {
 		const { limit = 30, offset = 0, user = null } = req.query;
 
-		const replies = await Reply.fetchReplies({
+		const replies = await ReplyRepository.fetchReplies({
 			user,
 			offset,
 			limit,
@@ -35,14 +35,14 @@ module.exports = class {
 
 	// eslint-disable-next-line no-unused-vars
 	static async getOneReply(req, res, next) {
-		const reply = await Reply.fetchReply(req.params.reply);
+		const reply = await ReplyRepository.fetchReply(req.params.reply);
 
 		res.data(reply);
 	}
 
 	// eslint-disable-next-line no-unused-vars
 	static async updateReply(req, res, next) {
-		const reply = await Reply.edit({
+		const reply = await ReplyRepository.edit({
 			replyBody: req.body.reply_body,
 			user: req.user.id,
 			postID: req.params.post,
@@ -57,7 +57,7 @@ module.exports = class {
 
 	// eslint-disable-next-line no-unused-vars
 	static async deleteReply(req, res, next) {
-		const reply = await Reply.deleteReply({
+		const reply = await ReplyRepository.deleteReply({
 			postID: req.params.post,
 			replyID: req.params.reply,
 			user: req.user.id

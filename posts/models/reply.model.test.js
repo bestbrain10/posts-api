@@ -24,57 +24,7 @@ describe('Reply Model', () => {
 		expect(result).toEqual(true);
 	});
 
-	it('Fetches replies with pagination, without createdBy condition if user is null', async () => {
-		const replySpy = jest.spyOn(Reply, 'findAndCountAll').mockResolvedValue({
-			rows: [],
-			count: 1
-		});
-		const result = await Reply.fetchReplies({
-			postID: '1234',
-			limit: 1,
-			offset: 0
-		});
 
-		expect(replySpy).toBeCalledWith({
-			where: {
-				postId: '1234'
-			},
-			limit: 1,
-			offset: 0
-		});
-
-		expect(result).toEqual({
-			rows: [],
-			count: 1
-		});
-	});
-
-	it('Fetches replies with pagination, with createdBy condition if user is provided', async () => {
-		const replySpy = jest.spyOn(Reply, 'findAndCountAll').mockResolvedValue({
-			rows: [],
-			count: 1
-		});
-		const result = await Reply.fetchReplies({
-			user: '1234',
-			postID: '1234',
-			limit: 1,
-			offset: 0
-		});
-
-		expect(replySpy).toBeCalledWith({
-			where: {
-				createdBy: '1234',
-				postId: '1234',
-			},
-			limit: 1,
-			offset: 0
-		});
-
-		expect(result).toEqual({
-			rows: [],
-			count: 1
-		});
-	});
 
 	it('deletes post', async () => {
 		const replySpy = jest.spyOn(Reply, 'destroy').mockResolvedValueOnce(3);
@@ -93,17 +43,5 @@ describe('Reply Model', () => {
 				id: '456'
 			}
 		});
-	});
-
-	it('can fetch reply by ID', async () => {
-		const replySpy = jest.spyOn(Reply, 'findByPk').mockResolvedValueOnce({
-			replyBody: 'hello'
-		});
-
-		const result = await Reply.fetchReply('456');
-		expect(result).toEqual({
-			replyBody: 'hello'
-		});
-		expect(replySpy).toBeCalledWith('456');
 	});
 });

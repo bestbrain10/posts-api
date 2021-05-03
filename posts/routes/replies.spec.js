@@ -12,6 +12,7 @@ const _ = require('lodash');
 const { v4: uuid } = require('uuid');
 
 const email = `steve${uuid()}@avengers.com`;
+const replyProps = ['edited', 'user', 'replyBody', 'postId', 'id', 'createdBy', 'createdAt', 'updatedAt'];
 
 describe('Post API', () => {
 	let authDetails;
@@ -69,7 +70,7 @@ describe('Post API', () => {
 
 		it('returns post details', () => {
 			expect(Object.keys(response.body.data).sort())
-				.toEqual(['edited', 'replyBody', 'postId', 'id', 'createdBy', 'createdAt', 'updatedAt'].sort());
+				.toEqual(replyProps.sort());
 		});
 	});
 
@@ -268,10 +269,9 @@ describe('Post API', () => {
 		});
 
 		it('returns post reply details', () => {
-			const expectedKeys = ['replyBody', 'postId' , 'createdBy', 'edited', 'id', 'createdAt', 'updatedAt'].sort();
 
 			expect(response.body.data.rows.every(post => {
-				return !_.difference(Object.keys(post).sort(), expectedKeys).length;
+				return !_.difference(Object.keys(post).sort(), replyProps.sort()).length;
 			}))
 				.toEqual(true);
 		});
@@ -320,10 +320,8 @@ describe('Post API', () => {
 		});
 
 		it('returns post replies details', () => {
-			const expectedKeys = ['replyBody', 'postId' , 'createdBy', 'edited', 'id', 'createdAt', 'updatedAt'].sort();
-
 			expect(response.body.data.rows.every(reply => {
-				return !_.difference(Object.keys(reply).sort(), expectedKeys).length;
+				return !_.difference(Object.keys(reply).sort(), replyProps.sort()).length;
 			}))
 				.toEqual(true);
 		});

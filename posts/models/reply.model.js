@@ -26,37 +26,6 @@ class Reply extends Model {
 		return !!count;
 	}
 
-	/**
-     * Find all the replies for user (if provided), within the specified offset / limit, 
-     * and get the total number of rows matching the query (or user).
-     * @param {object} param
-     * @param {string|null} param.user
-     * @param {number} param.limit
-     * @param {number} param.offset
-     * @param {string} param.postID
-     * @returns Promise<{rows: Reply[], count: number}>
-     */
-	static async fetchReplies({ user = null, limit, offset, postID }) {
-		return this.findAndCountAll({
-			where: {
-				...(user && {
-					createdBy: user
-				}),
-				postId: postID
-			},
-			limit,
-			offset
-		});
-	}
-
-	/**
-     * Find post reply based on its ID, 
-     * @param {string} replyID
-     * @returns Promise<Reply>
-     */
-	static async fetchReply(replyID) {
-		return this.findByPk(replyID);
-	}
 
 	/**
      * deletes reply based on condition, 
