@@ -1,5 +1,6 @@
 const { Model, DataTypes, } = require('sequelize');
 const DB = require('../../database');
+const mediaLinkVirtual = require('./media-link-virtual');
 
 class Post extends Model {
 	/**
@@ -23,38 +24,7 @@ class Post extends Model {
 
 		return !!count;
 	}
-
-	/**
-	 * Find all the post for user (if provided), within the specified offset / limit, 
-	 * and get the total number of rows matching the query (or user).
-	 * @param {object} param
-	 * @param {string|null} param.user
-	 * @param {number} param.limit
-	 * @param {number} param.offet
-	 * @returns Promise<{rows: Post[], count: number}>
-	 */
-	static async fetchPosts({ user = null, limit, offset }) {
-		return this.findAndCountAll({
-			...(user && {
-				where: {
-					createdBy: user
-				}
-			}),
-			limit,
-			offset,
-			// order: {}
-		});
-	}
-
-	/**
-	 * Find post based on its ID, 
-	 * @param {string} postID
-	 * @returns Promise<Post>
-	 */
-	static async fetchPost(postID) {
-		return this.findByPk(postID);
-	}
-
+	
 	/**
 	 * deletes post based on condition, 
 	 * returns Boolean equivalent of the number of rows deleted
@@ -106,10 +76,7 @@ Post.init({
 	},
 	mediaLink: {
 		type: new DataTypes.VIRTUAL(DataTypes.BOOLEAN, ['media']),
-		get: function() {
-			const path = `${(process.env.API_URL || '')}/uploads/`;
-			return `${path}${this.get('media')}`;
-		}
+		get: mediaLinkVirtual
 	},
 	postBody: {
 		type: DataTypes.TEXT,

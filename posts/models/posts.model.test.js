@@ -19,45 +19,7 @@ describe('Post Model', () => {
 		expect(result).toEqual(true);
 	});
 
-	it('Fetches posts with pagination, without createdBy condition if user is null', async () => {
-		const postSpy = jest.spyOn(Post, 'findAndCountAll').mockResolvedValue({ rows: [], count: 1 });
-		const result = await Post.fetchPosts({ limit: 1, offset: 0});
-
-		expect(postSpy).toBeCalledWith({
-			limit: 1,
-			offset: 0
-		});
-
-		expect(result).toEqual({
-			rows: [],
-			count: 1
-		});
-	});
-
-	it('Fetches posts with pagination, with createdBy condition if user is provided', async () => {
-		const postSpy = jest.spyOn(Post, 'findAndCountAll').mockResolvedValue({
-			rows: [],
-			count: 1
-		});
-		const result = await Post.fetchPosts({
-			user: '1234',
-			limit: 1,
-			offset: 0
-		});
-
-		expect(postSpy).toBeCalledWith({
-			where: {
-				createdBy: '1234'
-			},
-			limit: 1,
-			offset: 0
-		});
-
-		expect(result).toEqual({
-			rows: [],
-			count: 1
-		});
-	});
+	
 
 	it('deletes post', async () => {
 		const postSpy = jest.spyOn(Post, 'destroy').mockResolvedValueOnce(3);
@@ -86,13 +48,5 @@ describe('Post Model', () => {
 		});
 	});
 
-	it('can fetch post by ID', async () => {
-		const postSpy = jest.spyOn(Post, 'findByPk').mockResolvedValueOnce({ postBody: 'hello' });
-
-		const result = await Post.fetchPost('456');
-		expect(result).toEqual({
-			postBody: 'hello'
-		});
-		expect(postSpy).toBeCalledWith('456');
-	});
+	
 });

@@ -1,11 +1,10 @@
 const jwt = require('jsonwebtoken');
-const { JWTKEY } = process.env;
 
 module.exports = {
 	encode(payload) {
-		return jwt.sign(payload, JWTKEY);
+		return jwt.sign(payload, process.env.JWTKEY);
 	},
 	decode(payload) {
-		return jwt.verify(payload, JWTKEY);
+		return jwt.verify(payload, process.env.JWTKEY);
 	},
 };

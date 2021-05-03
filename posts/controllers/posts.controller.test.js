@@ -2,7 +2,8 @@
 
 const { mockNext, mockRequest, mockResponse } = require('../../__mocks__/http');
 const PostsController = require('./posts.controller');
-const Post = require('../models/post.model');
+// const Post = require('../models/post.model');
+const PostRepository = require('../repositories/posts.repository');
 const joiValidator = require('../../common/utils/joi-validator');
 
 describe('Posts Controller', () => {
@@ -40,7 +41,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const postSpy = jest.spyOn(Post, 'create').mockResolvedValueOnce({ 
+		const postSpy = jest.spyOn(PostRepository, 'create').mockResolvedValueOnce({
 			postBody: 'post_body is required',
 			createdBy: '1234'
 		});
@@ -74,7 +75,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const postSpy = jest.spyOn(Post, 'create').mockResolvedValueOnce({
+		const postSpy = jest.spyOn(PostRepository, 'create').mockResolvedValueOnce({
 			postBody: 'post_body is required',
 			createdBy: '1234'
 		});
@@ -101,7 +102,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const postSpy = jest.spyOn(Post, 'fetchPost').mockResolvedValueOnce({
+		const postSpy = jest.spyOn(PostRepository, 'fetchPost').mockResolvedValueOnce({
 			id: '1234',
 			postBody: 'post_body is required',
 			createdBy: '1234'
@@ -123,7 +124,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const postSpy = jest.spyOn(Post, 'fetchPosts').mockResolvedValueOnce([{
+		const postSpy = jest.spyOn(PostRepository, 'fetchPosts').mockResolvedValueOnce([{
 			id: '1234',
 			postBody: 'post_body is required',
 			createdBy: '1234'
@@ -151,7 +152,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const postSpy = jest.spyOn(Post, 'fetchPosts').mockResolvedValueOnce([{
+		const postSpy = jest.spyOn(PostRepository, 'fetchPosts').mockResolvedValueOnce([{
 			id: '1234',
 			postBody: 'post_body is required',
 			createdBy: '1234'
@@ -187,7 +188,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const postSpy = jest.spyOn(Post, 'edit').mockResolvedValueOnce(true);
+		const postSpy = jest.spyOn(PostRepository, 'edit').mockResolvedValueOnce(true);
 
 		await PostsController.updatePost(req, res, mockNext);
 
@@ -219,7 +220,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const postSpy = jest.spyOn(Post, 'edit').mockResolvedValueOnce(true);
+		const postSpy = jest.spyOn(PostRepository, 'edit').mockResolvedValueOnce(true);
 
 		await PostsController.updatePost(req, res, mockNext);
 
@@ -249,7 +250,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const postSpy = jest.spyOn(Post, 'edit').mockResolvedValueOnce(false);
+		const postSpy = jest.spyOn(PostRepository, 'edit').mockResolvedValueOnce(false);
 
 		await PostsController.updatePost(req, res, mockNext);
 
@@ -273,7 +274,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const postSpy = jest.spyOn(Post, 'deletePost').mockResolvedValueOnce(true);
+		const postSpy = jest.spyOn(PostRepository, 'deletePost').mockResolvedValueOnce(true);
 
 		await PostsController.deletePost(req, res, mockNext);
 
@@ -298,7 +299,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const postSpy = jest.spyOn(Post, 'deletePost').mockResolvedValueOnce(false);
+		const postSpy = jest.spyOn(PostRepository, 'deletePost').mockResolvedValueOnce(false);
 
 		await PostsController.deletePost(req, res, mockNext);
 
@@ -323,7 +324,7 @@ describe('Posts Controller', () => {
 
 		const res = mockResponse();
 
-		const postSpy = jest.spyOn(Post, 'exists').mockResolvedValueOnce(false);
+		const postSpy = jest.spyOn(PostRepository, 'exists').mockResolvedValueOnce(false);
 
 		await PostsController.postExists(req, res, mockNext);
 
@@ -345,7 +346,7 @@ describe('Posts Controller', () => {
 		const res = mockResponse();
 		const next = jest.fn();
 
-		const postSpy = jest.spyOn(Post, 'exists').mockResolvedValueOnce(true);
+		const postSpy = jest.spyOn(PostRepository, 'exists').mockResolvedValueOnce(true);
 
 		await PostsController.postExists(req, res, next);
 

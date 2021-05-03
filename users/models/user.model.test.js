@@ -145,6 +145,9 @@ describe('User Model', () => {
 	});
 
 	describe('Password', () =>  {
+		afterEach(() => {
+			jest.clearAllMocks();
+		});
 		it('Can compare password with wrong password, returns false', () => {
 			const user = new User({ password: 'hello' });
 
@@ -225,6 +228,35 @@ describe('User Model', () => {
 			try {
 				await User.validatePasswordResetToken('jibberish');
 			}catch(e) {
+				expect(jwtSpy).toBeCalledWith('jibberish');
+				expect(e).toBe('invalid password reset token');
+			}
+		});
+
+		it('returns error if token is expired', async () => {
+			process.env.JWTKEY = 'magickey';
+			const token = jwt.encode({
+				user: 'oof',
+				exp: Math.floor(Date.now() / 1000) - (60 * 60),
+			});
+
+			try {
+				await User.validatePasswordResetToken(token);
+			} catch (e) {
+				expect(e).toBe('token expired, try requesting for another one');
+			}
+		});
+
+
+		it('returns error decoding throws error', async () => {
+			const jwtSpy = jest.spyOn(jwt, 'decode');
+			jwtSpy.mockRejectedValueOnce({
+				name: 'AnyOtherError'
+			});
+
+			try {
+				await User.validatePasswordResetToken('jibberish');
+			} catch (e) {
 				expect(jwtSpy).toBeCalledWith('jibberish');
 				expect(e).toBe('invalid password reset token');
 			}

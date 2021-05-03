@@ -1,4 +1,5 @@
 require('dotenv').config();
+process.env.NODE_ENV = 'test';
 
 const request = require('supertest');
 const server = require('../../server');

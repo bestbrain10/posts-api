@@ -4,6 +4,7 @@ const DB = require('../../database');
 const { omit } = require('lodash');
 const jwt = require('../../common/utils/jwt');
 const Email = require('../../emails');
+const hashPasswordHook = require('./hash-password-hook');
 
 class User extends Model {
 
@@ -22,7 +23,7 @@ class User extends Model {
 	 * @param {object} user 
 	 * @returns 
 	 */
-	static async register(user, sendMail = true) {
+	static async register(user) {
 		const emailExists = await this.count({
 			where: {
 				email: user.email
@@ -37,17 +38,15 @@ class User extends Model {
 
 		const newUser = await this.create(user);
 
-		if (sendMail) {
-			await Email({
-				data: {
-					fullname: user.fullname,
-				},
-				subject: 'Welcome onboard!',
-				email: user.email,
-				template: 'welcome'
-			});
-		}
-
+		await Email({
+			data: {
+				fullname: user.fullname,
+			},
+			subject: 'Welcome onboard!',
+			email: user.email,
+			template: 'welcome'
+		});
+		
 		return omit(newUser.toJSON(), ['password']);
 	}
 
@@ -150,7 +149,7 @@ class User extends Model {
 	 * @param {boolean} sendMail 
 	 * @returns 
 	 */
-	static async requestPasswordReset(email, sendMail = true) {
+	static async requestPasswordReset(email) {
 		const user = await this.findOne({
 			where: {
 				email
@@ -168,17 +167,15 @@ class User extends Model {
 			exp: Math.floor(Date.now() / 1000) + (60 * 60),
 		});
 
-		if (sendMail) {
-			await Email({
-				data: {
-					fullname: user.fullname,
-					token
-				},
-				subject: 'Reset Password',
-				email,
-				template: 'reset-password'
-			});
-		}
+		await Email({
+			data: {
+				fullname: user.fullname,
+				token
+			},
+			subject: 'Reset Password',
+			email,
+			template: 'reset-password'
+		});
 
 		return true;
 	}
@@ -196,7 +193,7 @@ class User extends Model {
 			}
 			return decoded.user;
 		} catch (e) {
-			const tokenExpired = e && e.name && e.name == 'TokenExpiredError';
+			const tokenExpired = e && e.name && e.name === 'TokenExpiredError';
 			const message = tokenExpired ? 'token expired, try requesting for another one' : 'invalid password reset token';
 			return Promise.reject(message);
 		}
@@ -239,8 +236,6 @@ User.init({
 	sequelize: DB
 });
 
-User.beforeCreate((user) => {
-	user.password = hashPassword(user.password);
-});
+User.beforeCreate(hashPasswordHook);
 
 module.exports = User;

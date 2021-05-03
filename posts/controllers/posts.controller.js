@@ -1,6 +1,6 @@
 
 const Joi = require('joi');
-const Post = require('../models/post.model');
+const PostRepository = require('../repositories/posts.repository');
 
 module.exports = class {
 	static get postSchema() {
@@ -11,7 +11,7 @@ module.exports = class {
 
 	// eslint-disable-next-line no-unused-vars
 	static async create(req, res, next) {
-		const post = await Post.create({
+		const post = await PostRepository.create({
 			...(req.file && { media: req.file.filename }),
 			postBody: req.body.post_body,
 			createdBy: req.user.id
@@ -23,7 +23,7 @@ module.exports = class {
 	static async getAllPosts(req, res, next) {
 		const { limit = 30, offset = 0, user = null } = req.query;
 
-		const posts = await Post.fetchPosts({ user, offset, limit });
+		const posts = await PostRepository.fetchPosts({ user, offset, limit });
 
 		res.data(
 			posts
@@ -32,13 +32,13 @@ module.exports = class {
 
 	// eslint-disable-next-line no-unused-vars
 	static async getOnePost(req, res, next) {
-		const post = await Post.fetchPost(req.params.post);
+		const post = await PostRepository.fetchPost(req.params.post);
 
 		res.data( post );
 	}
 
 	static async postExists(req, res, next) {
-		const post = await Post.exists(req.params.post);
+		const post = await PostRepository.exists(req.params.post);
 
 		if(!post) {
 			return res.status(404).error({ post: 'post does not exist' });
@@ -50,7 +50,7 @@ module.exports = class {
 
 	// eslint-disable-next-line no-unused-vars
 	static async updatePost(req, res, next) {
-		const post = await Post.edit({
+		const post = await PostRepository.edit({
 			...(req.file && { media: req.file.filename }),
 			postBody: req.body.post_body,
 			user: req.user.id,
@@ -65,7 +65,7 @@ module.exports = class {
 
 	// eslint-disable-next-line no-unused-vars
 	static async deletePost(req, res, next) {
-		const post = await Post.deletePost({
+		const post = await PostRepository.deletePost({
 			postID: req.params.post,
 			user: req.user.id
 		});
