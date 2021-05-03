@@ -1,8 +1,7 @@
-const { Model, DataTypes, } = require('sequelize');
+const { Model, DataTypes } = require('sequelize');
 const DB = require('../../database');
 
 class Like extends Model {
-
 	/**
      * likes a post based on condition, 
      * returns existing like or new like

@@ -8,8 +8,8 @@ const userSeeder = require('../../__mocks__/user');
 const postSeeder = require('../../__mocks__/post');
 const _ = require('lodash');
 const { v4: uuid } = require('uuid');
-const postProperties = ['edited', 'user' , 'media', 'mediaLink', 'postBody', 'id', 'createdBy', 'createdAt', 'updatedAt'];
-const nonCreateProperties = ['user'];
+const postProperties = ['edited', 'user', 'likeCount', 'replyCount', 'media', 'mediaLink', 'postBody', 'id', 'createdBy', 'createdAt', 'updatedAt'];
+const nonCreateProperties = ['user', 'likeCount', 'replyCount'];
 
 const email = `steve${uuid()}@avengers.com`;
 

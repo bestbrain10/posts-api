@@ -1,5 +1,9 @@
 const PostsRepository = require('./posts.repository');
 const User = require('../../users/models/user.model');
+const countSubQuery = require('./count-sub-query');
+const Likes = require('../models/like.model');
+const Replies = require('../models/reply.model');
+
 
 
 describe('Posts Repository', () => {
@@ -19,6 +23,22 @@ describe('Posts Repository', () => {
 			order: [
 				['createdAt', 'DESC']
 			],
+			attributes: {
+				include: [
+					[countSubQuery({
+						table: Likes.tableName,
+						column: 'post_id',
+						foreignTable: 'Post',
+						foreignKey: 'id'
+					}), 'likeCount'],
+					[countSubQuery({
+						table: Replies.tableName,
+						column: 'post_id',
+						foreignTable: 'Post',
+						foreignKey: 'id'
+					}), 'replyCount'],
+				]
+			},
 			include: [{
 				model: User,
 				attributes: ['id', 'fullname'],
@@ -52,6 +72,22 @@ describe('Posts Repository', () => {
 			order: [
 				['createdAt', 'DESC']
 			],
+			attributes: {
+				include: [
+					[countSubQuery({
+						table: Likes.tableName,
+						column: 'post_id',
+						foreignTable: 'Post',
+						foreignKey: 'id'
+					}), 'likeCount'],
+					[countSubQuery({
+						table: Replies.tableName,
+						column: 'post_id',
+						foreignTable: 'Post',
+						foreignKey: 'id'
+					}), 'replyCount'],
+				]
+			},
 			include: [{
 				model: User,
 				attributes: ['id', 'fullname'],
@@ -75,6 +111,22 @@ describe('Posts Repository', () => {
 			postBody: 'hello'
 		});
 		expect(postSpy).toBeCalledWith('456', {
+			attributes: {
+				include: [
+					[countSubQuery({
+						table: Likes.tableName,
+						column: 'post_id',
+						foreignTable: 'Post',
+						foreignKey: 'id'
+					}), 'likeCount'],
+					[countSubQuery({
+						table: Replies.tableName,
+						column: 'post_id',
+						foreignTable: 'Post',
+						foreignKey: 'id'
+					}), 'replyCount'],
+				]
+			},
 			include: [{
 				model: User,
 				attributes: ['id', 'fullname'],
