@@ -91,7 +91,6 @@ Post.init({
 	tableName: 'posts',
 	underscored: true,
 	timestamps: true,
-	modelName: 'Post',
 	sequelize: DB
 });
 
